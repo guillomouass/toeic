@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TOEIC Master</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0f; font-family: 'Trebuchet MS', sans-serif; color: #fff; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #111; }
+  ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+
+const SYLLABUS = {
+  B1: [
+    {
+      id: "b1-1", level: "B1", title: "Adverbes de Temps", subtitle: "Yet · Since · Ever · Soon · Already · Still", icon: "⏱", color: "#10b981",
+      rule: `**Yet** (négatif/question) = "encore / toujours pas". Placé en fin de phrase.\n**Already** (affirmatif) = "déjà". Se place avant le verbe principal ou en fin.\n**Still** = "toujours / encore" (continuité). Se place avant le verbe.\n**Since** = "depuis" un point précis dans le temps.\n**Ever** = "jamais / déjà" dans les questions et superlatifs.\n**Soon** = "bientôt" (futur proche).`,
+      examples: [
+        { en: "She has NOT finished the report YET.", fr: "Elle n'a pas encore fini le rapport." },
+        { en: "He has ALREADY submitted the form.", fr: "Il a déjà soumis le formulaire." },
+        { en: "We have been partners SINCE 2018.", fr: "Nous sommes partenaires depuis 2018." },
+        { en: "Is this the best offer you have EVER made?", fr: "Est-ce la meilleure offre que vous ayez jamais faite ?" },
+      ],
+      trap: "Ne confonds pas STILL (continuité) et YET (attente). 'He still hasn't called' = il continue de ne pas appeler. 'He hasn't called yet' = on attend toujours son appel.",
+      questions: [
+        { id: "b1-1-q1", q: "The package has not arrived _______ , despite being shipped three days ago.", opts: ["A) already","B) yet","C) still","D) ever"], ans: "B", exp: "YET s'utilise dans les phrases négatives pour indiquer qu'une action attendue n'a pas encore eu lieu. Placé en fin de phrase." },
+        { id: "b1-1-q2", q: "We have _______ received confirmation from the client — no need to follow up.", opts: ["A) yet","B) still","C) already","D) soon"], ans: "C", exp: "ALREADY dans une phrase affirmative signifie 'déjà'. L'action est accomplie." },
+        { id: "b1-1-q3", q: "The company has been expanding _______ its merger with Global Corp.", opts: ["A) already","B) soon","C) ever","D) since"], ans: "D", exp: "SINCE + point de départ précis (la fusion). Indique le début d'une période qui dure jusqu'à maintenant." },
+        { id: "b1-1-q4", q: "Is this the best contract we have _______ negotiated with a foreign partner?", opts: ["A) still","B) yet","C) ever","D) since"], ans: "C", exp: "EVER dans une question signifie 'jamais / déjà' et renforce le superlatif ou l'interrogation sur toute l'expérience passée." },
+        { id: "b1-1-q5", q: "The CEO is _______ reviewing the proposal; he hasn't approved it.", opts: ["A) yet","B) already","C) ever","D) still"], ans: "D", exp: "STILL indique une continuité inattendue ou prolongée. Le PDG continue de faire quelque chose (action en cours)." },
+      ]
+    },
+    {
+      id: "b1-2", level: "B1", title: "Adjectifs de Quantité", subtitle: "Total · Many · Final · Empty", icon: "🔢", color: "#10b981",
+      rule: `**Total** = complet, global (qualifie un résultat ou une somme). Adjectif AVANT le nom.\n**Many** = beaucoup de (noms dénombrables au pluriel uniquement).\n**Final** = dernier, définitif. Adjectif placé AVANT le nom.\n**Empty** = vide (état physique ou abstrait).`,
+      examples: [
+        { en: "The TOTAL cost of the project exceeded our budget.", fr: "Le coût total du projet a dépassé notre budget." },
+        { en: "MANY employees were absent during the strike.", fr: "De nombreux employés étaient absents pendant la grève." },
+        { en: "Please read the FINAL clause of the contract carefully.", fr: "Veuillez lire attentivement la clause finale du contrat." },
+        { en: "The conference room was EMPTY when we arrived.", fr: "La salle de conférence était vide à notre arrivée." },
+      ],
+      trap: "'Many' ne s'utilise qu'avec des noms dénombrables au pluriel. Pour les noms indénombrables, utilise 'much' (much information, much time).",
+      questions: [
+        { id: "b1-2-q1", q: "The _______ revenue for fiscal year 2025 surpassed all previous records.", opts: ["A) many","B) final","C) total","D) empty"], ans: "C", exp: "TOTAL revenue = chiffre d'affaires global. Adjectif de quantité globale qui qualifie un nom singulier." },
+        { id: "b1-2-q2", q: "_______ candidates applied for the position, but only three were shortlisted.", opts: ["A) Total","B) Many","C) Final","D) Empty"], ans: "B", exp: "MANY + nom dénombrable pluriel (candidates). Indique une grande quantité de personnes qu'on peut compter." },
+        { id: "b1-2-q3", q: "Please review the _______ draft before it is sent to the client for signature.", opts: ["A) empty","B) many","C) total","D) final"], ans: "D", exp: "FINAL draft = version définitive. FINAL indique le caractère définitif, la dernière étape." },
+        { id: "b1-2-q4", q: "The new office space was _______ when the team moved in.", opts: ["A) final","B) total","C) many","D) empty"], ans: "D", exp: "EMPTY = vide. Utilisé comme attribut du sujet après 'was'. Décrit l'état physique du lieu." },
+        { id: "b1-2-q5", q: "The audit revealed that _______ expenses had gone undeclared for two years.", opts: ["A) empty","B) final","C) total","D) many"], ans: "D", exp: "MANY expenses = de nombreuses dépenses (nom dénombrable pluriel)." },
+      ]
+    },
+    {
+      id: "b1-3", level: "B1", title: "Prépositions de Temps", subtitle: "By · Until · During · While", icon: "📅", color: "#10b981",
+      rule: `**By** = "avant / d'ici" une date (deadline ponctuelle).\n**Until / Till** = "jusqu'à" → action continue qui se termine à ce moment.\n**During** + NOM = pendant (un événement, une période).\n**While** + Sujet + Verbe = pendant que (deux actions simultanées).`,
+      examples: [
+        { en: "Please submit the report BY Friday noon.", fr: "Veuillez remettre le rapport avant vendredi midi." },
+        { en: "The office will be closed UNTIL further notice.", fr: "Le bureau sera fermé jusqu'à nouvel ordre." },
+        { en: "DURING the presentation, several questions arose.", fr: "Pendant la présentation, plusieurs questions ont émergé." },
+        { en: "WHILE the manager was on leave, revenues dropped.", fr: "Pendant que le directeur était en congé, les revenus ont chuté." },
+      ],
+      trap: "BY = deadline ponctuelle (l'action doit être faite AVANT). UNTIL = durée continue jusqu'à un point. 'Finish by Monday' ≠ 'wait until Monday'.",
+      questions: [
+        { id: "b1-3-q1", q: "All invoices must be processed _______ the end of the quarter.", opts: ["A) during","B) while","C) until","D) by"], ans: "D", exp: "BY = deadline. Les factures doivent être traitées AVANT la fin du trimestre." },
+        { id: "b1-3-q2", q: "The construction site will remain active _______ spring.", opts: ["A) by","B) during","C) until","D) while"], ans: "C", exp: "UNTIL = durée continue. Le chantier reste actif EN CONTINU jusqu'au printemps." },
+        { id: "b1-3-q3", q: "Several key decisions were made _______ the board retreat last week.", opts: ["A) while","B) until","C) during","D) by"], ans: "C", exp: "DURING + NOM (the board retreat). On ne peut pas utiliser 'while' car il n'y a pas de sujet + verbe après." },
+        { id: "b1-3-q4", q: "_______ the engineers were testing the system, an unexpected error occurred.", opts: ["A) During","B) By","C) Until","D) While"], ans: "D", exp: "WHILE + sujet + verbe. Deux actions simultanées. 'During' est incorrect ici car suivi d'une phrase complète." },
+        { id: "b1-3-q5", q: "You may use the conference room _______ 3 p.m., after which it will be reserved.", opts: ["A) by","B) during","C) until","D) while"], ans: "C", exp: "UNTIL 3 p.m. = vous pouvez l'utiliser EN CONTINU jusqu'à 15h." },
+      ]
+    }
+  ],
+  B2: [
+    {
+      id: "b2-1", level: "B2", title: "Famille de Mots Pièges", subtitle: "Late · Later · Latest · Lateness · Lately", icon: "🕵️", color: "#f59e0b",
+      rule: `**Late** (adj/adv) = en retard, tard.\n**Later** (adv comparatif) = plus tard.\n**Latest** (adj superlatif) = le plus récent.\n**Lateness** (nom) = le fait d'être en retard.\n**Lately** (adv) = ces derniers temps, récemment.`,
+      examples: [
+        { en: "The LATEST market analysis shows a 12% growth.", fr: "La toute dernière analyse de marché montre une croissance de 12%." },
+        { en: "She has been working overtime LATELY.", fr: "Elle a fait des heures supplémentaires ces derniers temps." },
+        { en: "His chronic LATENESS damaged his professional reputation.", fr: "Son retard chronique a nui à sa réputation professionnelle." },
+        { en: "We will discuss the budget revision LATER this afternoon.", fr: "Nous discuterons de la révision budgétaire plus tard cet après-midi." },
+      ],
+      trap: "LATEST ≠ LAST. 'The latest model' = le plus récent (il en viendra d'autres). 'The last model' = le dernier de la série (fin définitive). 'Lately' ≠ 'late' : lately = ces derniers temps.",
+      questions: [
+        { id: "b2-1-q1", q: "The team has been struggling to meet deadlines _______ , which concerns management.", opts: ["A) late","B) latest","C) lateness","D) lately"], ans: "D", exp: "LATELY = ces derniers temps. Adverbe qui indique une tendance récente sur une période." },
+        { id: "b2-1-q2", q: "Please refer to the _______ version of the compliance guidelines on the intranet.", opts: ["A) lately","B) lateness","C) latest","D) later"], ans: "C", exp: "LATEST version = la version la plus récente. Superlatif adjectival." },
+        { id: "b2-1-q3", q: "His habitual _______ to meetings is now a subject of discussion in his performance review.", opts: ["A) late","B) later","C) latest","D) lateness"], ans: "D", exp: "LATENESS est le NOM dérivé de 'late'. Après 'his habitual', on attend un NOM." },
+        { id: "b2-1-q4", q: "We will address the logistics issue _______ once the urgent matters are resolved.", opts: ["A) late","B) later","C) lateness","D) lately"], ans: "B", exp: "LATER = plus tard (comparatif adverbial). Indique un moment ultérieur." },
+        { id: "b2-1-q5", q: "The CEO arrived _______ to the shareholder meeting, causing visible tension.", opts: ["A) lately","B) latest","C) lateness","D) late"], ans: "D", exp: "LATE (adverbe) = en retard. Se place après le verbe." },
+      ]
+    },
+    {
+      id: "b2-2", level: "B2", title: "Faux-Amis Dangereux", subtitle: "Attend · Assist · Actually · Currently · Hard · Hardly", icon: "⚠️", color: "#f59e0b",
+      rule: `**Attend** (v) = assister à, être présent à (un événement).\n**Assist** (v) = aider, venir en aide à (quelqu'un).\n**Actually** (adv) = en fait, à vrai dire (correction).\n**Currently** (adv) = actuellement, en ce moment.\n**Hard** (adj/adv) = difficile / travailler dur.\n**Hardly** (adv négatif) = à peine, presque pas.`,
+      examples: [
+        { en: "All managers must ATTEND the Q4 briefing.", fr: "Tous les managers doivent assister au briefing T4." },
+        { en: "Could you ASSIST the new intern with onboarding?", fr: "Pourriez-vous aider le nouvel stagiaire ?" },
+        { en: "ACTUALLY, the merger was approved six months ago.", fr: "En fait, la fusion a été approuvée il y a six mois." },
+        { en: "The position is CURRENTLY filled.", fr: "Le poste est actuellement pourvu." },
+      ],
+      trap: "HARDLY = à peine (sens NÉGATIF). 'She works hard' (elle travaille dur) vs 'She hardly works' (elle travaille à peine). Ce sont deux sens opposés !",
+      questions: [
+        { id: "b2-2-q1", q: "All department heads are expected to _______ the annual strategy summit.", opts: ["A) assist","B) attend","C) join to","D) participate to"], ans: "B", exp: "ATTEND + événement = être présent à. ASSIST = aider quelqu'un (complément = une personne)." },
+        { id: "b2-2-q2", q: "The help desk team is available to _______ you with any technical issues.", opts: ["A) attend","B) currently","C) assist","D) hardly"], ans: "C", exp: "ASSIST + personne = aider. Le complément ici est 'you' (une personne)." },
+        { id: "b2-2-q3", q: "The project is _______ in its final testing phase before the official launch.", opts: ["A) actually","B) hardly","C) currently","D) hard"], ans: "C", exp: "CURRENTLY = en ce moment. ACTUALLY = en fait (correction). Le contexte décrit un état présent." },
+        { id: "b2-2-q4", q: "I _______ recognized the new branch manager — she looked so different!", opts: ["A) hard","B) currently","C) actually","D) hardly"], ans: "D", exp: "HARDLY = à peine. 'I hardly recognized her' = je l'ai à peine reconnue." },
+        { id: "b2-2-q5", q: "_______ , the decision to relocate the headquarters was made last year.", opts: ["A) Currently","B) Hardly","C) Actually","D) Hard"], ans: "C", exp: "ACTUALLY = en fait (introduit une correction ou précision sur une idée reçue)." },
+      ]
+    },
+    {
+      id: "b2-3", level: "B2", title: "Paires Corrélatives", subtitle: "Both…and · Either…or · Neither…nor · Not only…but also", icon: "🔗", color: "#f59e0b",
+      rule: `**Both…and** = les deux (affirmatif inclusif).\n**Either…or** = l'un ou l'autre (choix exclusif).\n**Neither…nor** = ni l'un ni l'autre (double négatif).\n**Not only…but also** = non seulement…mais aussi.\n⚠️ Avec Either/Neither, le verbe s'accorde avec le sujet le plus proche.`,
+      examples: [
+        { en: "BOTH the CEO and the CFO signed the agreement.", fr: "Le PDG et le DAF ont tous les deux signé l'accord." },
+        { en: "EITHER the director or the deputy must be present.", fr: "Soit le directeur, soit son adjoint doit être présent." },
+        { en: "NEITHER the supplier NOR the client was satisfied.", fr: "Ni le fournisseur ni le client n'était satisfait." },
+        { en: "NOT ONLY did sales increase, BUT ALSO retention improved.", fr: "Non seulement les ventes ont augmenté, mais la fidélisation s'est améliorée." },
+      ],
+      trap: "NEITHER…NOR entraîne un sens négatif — n'ajoute jamais 'not' avec. 'Neither A nor B is...' est correct. 'Neither A nor B is not...' = double négation incorrecte en anglais.",
+      questions: [
+        { id: "b2-3-q1", q: "_______ the marketing team _______ the sales team has reviewed the new campaign strategy.", opts: ["A) Both / and","B) Either / or","C) Neither / nor","D) Not only / but also"], ans: "C", exp: "NEITHER…NOR = ni l'un ni l'autre. Le verbe s'accorde avec le sujet le plus proche (team → has)." },
+        { id: "b2-3-q2", q: "The new software is _______ efficient _______ user-friendly, making it ideal for all teams.", opts: ["A) either / or","B) neither / nor","C) both / and","D) not only / but"], ans: "C", exp: "BOTH…AND = les deux (affirmatif). Les deux qualités sont présentes simultanément." },
+        { id: "b2-3-q3", q: "You may submit the application _______ by email _______ through the online portal.", opts: ["A) both / and","B) either / or","C) neither / nor","D) not only / but also"], ans: "B", exp: "EITHER…OR = l'un ou l'autre (choix). Deux options proposées." },
+        { id: "b2-3-q4", q: "_______ did the company reduce costs, _______ it managed to increase its market share.", opts: ["A) Both / and","B) Either / or","C) Neither / nor","D) Not only / but also"], ans: "D", exp: "NOT ONLY…BUT ALSO = non seulement…mais aussi. Notez l'inversion 'Not only did...'." },
+        { id: "b2-3-q5", q: "_______ the vendor _______ the procurement officer was aware of the contract changes.", opts: ["A) Not only / but also","B) Both / and","C) Either / or","D) Neither / nor"], ans: "D", exp: "NEITHER…NOR : les deux parties ignoraient les changements. 'was' s'accorde avec 'procurement officer'." },
+      ]
+    }
+  ],
+  C1: [
+    {
+      id: "c1-1", level: "C1", title: "Conditionnels Avancés", subtitle: "Only if · Unless · Provided that · As long as", icon: "🧩", color: "#8b5cf6",
+      rule: `**Unless** = "à moins que / sauf si" → équivaut à "if not".\n**Only if** = "uniquement si" → condition stricte et exclusive.\n**Provided (that)** = "à condition que" → condition formelle.\n**As long as** = "tant que / du moment que" → condition de durée.\n⚠️ After UNLESS/PROVIDED THAT → présent simple (pas de 'will').`,
+      examples: [
+        { en: "UNLESS the report is submitted by noon, the meeting will be postponed.", fr: "À moins que le rapport ne soit remis avant midi, la réunion sera reportée." },
+        { en: "The contract is valid PROVIDED THAT both parties comply.", fr: "Le contrat est valable à condition que les deux parties respectent ses termes." },
+        { en: "We will proceed ONLY IF the board gives final approval.", fr: "Nous procéderons uniquement si le conseil donne son accord final." },
+        { en: "AS LONG AS quality standards are maintained, we will renew.", fr: "Du moment que les standards sont maintenus, nous renouvellerons." },
+      ],
+      trap: "UNLESS = 'if not'. Ne jamais écrire 'Unless if' ou 'Unless...not'. 'Unless you don't call' est une double négation incorrecte. Correct : 'Unless you call'.",
+      questions: [
+        { id: "c1-1-q1", q: "The bonus will be released _______ all quarterly targets have been exceeded.", opts: ["A) unless","B) only if","C) however","D) despite"], ans: "B", exp: "ONLY IF = uniquement si. Condition stricte. La prime est versée exclusivement si les objectifs sont dépassés." },
+        { id: "c1-1-q2", q: "_______ the client approves the revised budget, the project cannot move forward.", opts: ["A) Provided that","B) Only if","C) Unless","D) As long as"], ans: "C", exp: "UNLESS = à moins que. Reformulation : 'If the client does not approve the budget, the project cannot move forward.'" },
+        { id: "c1-1-q3", q: "The partnership agreement shall remain in force _______ both companies fulfill their obligations.", opts: ["A) unless","B) only if","C) provided that","D) however"], ans: "C", exp: "PROVIDED THAT = à condition que. Langage formel et contractuel." },
+        { id: "c1-1-q4", q: "We are willing to extend the deadline _______ the team demonstrates measurable progress.", opts: ["A) unless","B) as long as","C) only if","D) despite"], ans: "B", exp: "AS LONG AS = du moment que / tant que. Condition continue dans le temps." },
+        { id: "c1-1-q5", q: "The data must be encrypted _______ it is stored or transmitted externally.", opts: ["A) only if","B) provided that","C) whether","D) unless"], ans: "A", exp: "ONLY IF = uniquement si certaines conditions sont remplies (stockage ou transmission externe)." },
+      ]
+    },
+    {
+      id: "c1-2", level: "C1", title: "Verbes Complexes", subtitle: "Rise · Raise · Arise · Lay · Lie", icon: "⚡", color: "#8b5cf6",
+      rule: `**Rise / Rose / Risen** = monter (intransitif — pas d'objet).\n**Raise / Raised / Raised** = lever, augmenter (transitif — besoin d'un objet).\n**Arise / Arose / Arisen** = surgir, apparaître (problèmes — intransitif).\n**Lie / Lay / Lain** = être allongé, se trouver (intransitif).\n**Lay / Laid / Laid** = poser quelque chose (transitif — besoin d'un objet).`,
+      examples: [
+        { en: "Operating costs have RISEN by 8% this year.", fr: "Les coûts d'exploitation ont augmenté de 8% cette année." },
+        { en: "The board voted to RAISE the dividend.", fr: "Le conseil d'administration a voté pour augmenter le dividende." },
+        { en: "Several issues AROSE during the audit.", fr: "Plusieurs problèmes sont apparus pendant l'audit." },
+        { en: "Please LAY the documents on the table.", fr: "Veuillez poser les documents sur la table." },
+      ],
+      trap: "Le passé de LIE (être allongé) est LAY → 'He lay on the floor'. Le présent de LAY (poser) est LAY → 'Lay the files here'. Le contexte est crucial !",
+      questions: [
+        { id: "c1-2-q1", q: "Inflation has _______ steadily for the third consecutive quarter, alarming economists.", opts: ["A) raised","B) arisen","C) risen","D) lain"], ans: "C", exp: "RISEN = participe passé de RISE (monter seul, intransitif). L'inflation monte d'elle-même, sans agent." },
+        { id: "c1-2-q2", q: "The committee has decided to _______ additional funds to support the research initiative.", opts: ["A) rise","B) arise","C) lie","D) raise"], ans: "D", exp: "RAISE + objet (funds) = lever des fonds. Verbe transitif. RISE ne peut pas être suivi d'un objet direct." },
+        { id: "c1-2-q3", q: "A serious compliance issue has _______ that requires immediate board attention.", opts: ["A) raised","B) arisen","C) risen","D) laid"], ans: "B", exp: "ARISEN = participe passé de ARISE (surgir — problèmes, questions). Intransitif." },
+        { id: "c1-2-q4", q: "The responsibility for the error _______ with the procurement department.", opts: ["A) lies","B) lays","C) raises","D) arises"], ans: "A", exp: "LIES (LIE) = se trouver (figuré). 'The responsibility lies with...' = la responsabilité incombe à." },
+        { id: "c1-2-q5", q: "The architect carefully _______ the blueprints on the conference table for review.", opts: ["A) lied","B) rose","C) lay","D) laid"], ans: "D", exp: "LAID = passé de LAY (poser quelque chose, transitif). L'architecte a posé des documents." },
+      ]
+    },
+    {
+      id: "c1-3", level: "C1", title: "Inversions Grammaticales", subtitle: "Hardly had… · Little did… · No sooner…than · Seldom…", icon: "🔄", color: "#8b5cf6",
+      rule: `Structure : Adverbe négatif + auxiliaire + sujet + verbe.\n**Hardly/Scarcely had + S + V + when** = à peine...que\n**Little did + S + know** = loin de se douter que\n**No sooner had + S + V + than** = à peine...que\n**Seldom/Rarely + aux + S + V** = rarement\n**Not until + expr + did + S + V** = ce n'est qu'à partir de...que`,
+      examples: [
+        { en: "HARDLY HAD the meeting begun WHEN the fire alarm went off.", fr: "La réunion avait à peine commencé que l'alarme incendie s'est déclenchée." },
+        { en: "LITTLE DID the management KNOW that the merger would fail.", fr: "La direction était loin de se douter que la fusion échouerait." },
+        { en: "SELDOM DOES the committee approve such large expenditures.", fr: "Le comité approuve rarement de si grandes dépenses." },
+        { en: "NOT UNTIL the audit was complete DID they realize the extent of the fraud.", fr: "Ce n'est qu'une fois l'audit terminé qu'ils ont réalisé l'ampleur de la fraude." },
+      ],
+      trap: "Après l'adverbe négatif en tête de phrase, l'ordre est : auxiliaire + sujet (inversion). 'Hardly the meeting had begun' est INCORRECT. Correct : 'Hardly had the meeting begun...'",
+      questions: [
+        { id: "c1-3-q1", q: "_______ had the new CEO taken office when the company faced its first major crisis.", opts: ["A) Little","B) Seldom","C) Hardly","D) No sooner"], ans: "C", exp: "HARDLY HAD + sujet + V-participe + WHEN = à peine...que. Deux événements quasi-simultanés." },
+        { id: "c1-3-q2", q: "_______ did the investors know that the financial statements had been falsified.", opts: ["A) Hardly","B) Little","C) Seldom","D) No sooner"], ans: "B", exp: "LITTLE DID + sujet + KNOW = loin de se douter. Exprime une ignorance totale et dramatique." },
+        { id: "c1-3-q3", q: "No sooner had the acquisition been announced _______ rival bids began to emerge.", opts: ["A) when","B) that","C) as","D) than"], ans: "D", exp: "NO SOONER HAD…THAN = à peine...que. Structure figée. 'When' s'utilise avec HARDLY/SCARCELY." },
+        { id: "c1-3-q4", q: "_______ does the executive committee convene without a full quorum being present.", opts: ["A) Little","B) Hardly","C) No sooner","D) Seldom"], ans: "D", exp: "SELDOM + auxiliaire (does) + sujet + verbe = rarement. Inversion après adverbe de fréquence négatif." },
+        { id: "c1-3-q5", q: "Not until the third quarter _______ management acknowledge the severity of the cash flow problem.", opts: ["A) management acknowledged","B) did management acknowledge","C) had management been acknowledging","D) management did acknowledge"], ans: "B", exp: "NOT UNTIL + expr temporelle + DID + sujet + infinitif. L'inversion est obligatoire." },
+      ]
+    }
+  ]
+};
+
+const ALL_QUESTIONS = Object.values(SYLLABUS).flat().flatMap(m =>
+  m.questions.map(q => ({ ...q, moduleId: m.id, level: m.level, ruleName: m.title }))
+);
+
+const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+
+const INITIAL_HISTORY = [
+  { id: 1, date: "10/01/2026", type: "Test Global", score: 8, total: 20, level: "B1" },
+  { id: 2, date: "17/01/2026", type: "Examen Blanc", score: 13, total: 20, level: "B2" },
+  { id: 3, date: "02/02/2026", type: "Test Global", score: 16, total: 20, level: "B2+" },
+  { id: 4, date: "25/02/2026", type: "Examen Blanc", score: 18, total: 20, level: "C1" },
+];
+
+function getLevel(score, total) {
+  const p = score / total;
+  if (p >= 0.9) return "C1";
+  if (p >= 0.75) return "B2+";
+  if (p >= 0.6) return "B2";
+  if (p >= 0.45) return "B1+";
+  return "B1";
+}
+
+function getLevelColor(level) {
+  if (!level) return "#10b981";
+  if (level.startsWith("C")) return "#8b5cf6";
+  if (level.startsWith("B2")) return "#f59e0b";
+  return "#10b981";
+}
+
+function QuizEngine({ questions, title, onFinish, onQuit }) {
+  const [idx, setIdx] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [revealed, setRevealed] = useState(false);
+  const [chosen, setChosen] = useState(null);
+  const q = questions[idx];
+  const isLast = idx === questions.length - 1;
+  const pct = (idx / questions.length) * 100;
+
+  function selectOption(letter) {
+    if (revealed) return;
+    setChosen(letter);
+    setRevealed(true);
+  }
+
+  function next() {
+    const newAnswers = { ...answers, [q.id]: chosen };
+    if (isLast) {
+      const failed = questions.filter(qq => newAnswers[qq.id] !== qq.ans);
+      onFinish({ score: questions.length - failed.length, total: questions.length, failed });
+    } else {
+      setAnswers(newAnswers);
+      setIdx(idx + 1);
+      setChosen(null);
+      setRevealed(false);
+    }
+  }
+
+  const correct = chosen === q.ans;
+
+  return (
+    <div style={{minHeight:"100vh",background:"#0a0a0f",paddingBottom:40}}>
+      <div style={{background:"#111118",borderBottom:"1px solid #1e1e2e",padding:"14px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:10}}>
+        <button onClick={onQuit} style={{background:"transparent",border:"1px solid #2a2a3a",color:"#888",padding:"8px 16px",borderRadius:8,cursor:"pointer",fontSize:13}}>🔙 Quitter</button>
+        <span style={{color:"#d4a017",fontWeight:700,fontSize:14}}>{title}</span>
+        <span style={{color:"#555",fontSize:13}}>{idx+1}/{questions.length}</span>
+      </div>
+      <div style={{height:3,background:"#1a1a2e"}}>
+        <div style={{height:3,background:"linear-gradient(90deg,#d4a017,#f59e0b)",width:`${pct}%`,transition:"width 0.4s"}}/>
+      </div>
+      <div style={{maxWidth:680,margin:"36px auto",padding:"0 20px"}}>
+        {q.level && (
+          <div style={{display:"inline-block",padding:"3px 12px",borderRadius:20,background:getLevelColor(q.level)+"22",color:getLevelColor(q.level),border:`1px solid ${getLevelColor(q.level)}44`,fontSize:11,fontWeight:700,marginBottom:16,letterSpacing:1}}>
+            {q.level} · {q.ruleName}
+          </div>
+        )}
+        <div style={{background:"#111118",border:"1px solid #1e1e2e",borderRadius:16,padding:"28px 24px",marginBottom:18,boxShadow:"0 4px 30px rgba(0,0,0,0.5)"}}>
+          <p style={{color:"#e8e8f0",fontSize:17,lineHeight:1.8,fontFamily:"Georgia,serif",margin:0}}>{q.q}</p>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:10}}>
+          {q.opts.map((opt,i) => {
+            const letter = ["A","B","C","D"][i];
+            const isChosen = chosen === letter;
+            const isCorrectOpt = letter === q.ans;
+            let bg="#111118",border="#1e1e2e",color="#b0b0c0";
+            if (revealed) {
+              if (isCorrectOpt){bg="#052e1b";border="#10b981";color="#34d399";}
+              else if (isChosen){bg="#2e0505";border="#ef4444";color="#f87171";}
+            } else if (isChosen){bg="#1a1a2e";border="#d4a017";color="#fbbf24";}
+            return (
+              <button key={i} onClick={()=>selectOption(letter)} style={{background:bg,border:`2px solid ${border}`,borderRadius:12,padding:"14px 18px",cursor:revealed?"default":"pointer",display:"flex",alignItems:"center",gap:14,transition:"all 0.2s",textAlign:"left",width:"100%"}}>
+                <span style={{width:30,height:30,borderRadius:"50%",border:`2px solid ${border}`,display:"flex",alignItems:"center",justifyContent:"center",color:(revealed&&isCorrectOpt)?"#000":color,fontSize:12,fontWeight:700,flexShrink:0,background:(revealed&&isCorrectOpt)?"#10b981":(revealed&&isChosen&&!isCorrectOpt)?"#ef4444":"transparent"}}>
+                  {revealed&&isCorrectOpt?"✓":revealed&&isChosen&&!isCorrectOpt?"✗":letter}
+                </span>
+                <span style={{color,fontSize:14}}>{opt.slice(3)}</span>
+              </button>
+            );
+          })}
+        </div>
+        {revealed && (
+          <div style={{marginTop:18,background:correct?"#052e1b":"#1a0808",border:`1px solid ${correct?"#10b981":"#ef4444"}44`,borderRadius:12,padding:"16px 18px"}}>
+            <p style={{color:correct?"#34d399":"#f87171",fontWeight:700,fontSize:12,marginBottom:6}}>{correct?"✓ CORRECT":"✗ INCORRECT"}</p>
+            <p style={{color:"#b0b0c0",fontSize:13,lineHeight:1.6,margin:0}}>{q.exp}</p>
+          </div>
+        )}
+        {revealed && (
+          <button onClick={next} style={{marginTop:18,width:"100%",padding:16,background:"linear-gradient(135deg,#d4a017,#b8860b)",border:"none",borderRadius:12,color:"#0a0a0f",fontWeight:900,fontSize:15,cursor:"pointer"}}>
+            {isLast?"Voir mes résultats →":"Question suivante →"}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ResultsScreen({ score, total, failed, onBack, onRetry }) {
+  const pct = Math.round(score/total*100);
+  const level = getLevel(score,total);
+  const color = getLevelColor(level);
+  return (
+    <div style={{minHeight:"100vh",background:"#0a0a0f",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+      <div style={{maxWidth:560,width:"100%"}}>
+        <div style={{textAlign:"center",marginBottom:28}}>
+          <div style={{width:100,height:100,borderRadius:"50%",border:`4px solid ${color}`,display:"inline-flex",alignItems:"center",justifyContent:"center",flexDirection:"column",marginBottom:14}}>
+            <span style={{color,fontSize:26,fontWeight:900}}>{score}/{total}</span>
+            <span style={{color:color+"99",fontSize:11}}>{pct}%</span>
+          </div>
+          <h2 style={{color:"#fff",fontFamily:"Georgia,serif",fontSize:24,margin:"0 0 8px"}}>{pct>=80?"🏆 Excellent !":pct>=60?"💪 Bon résultat !":"📚 Continue l'effort !"}</h2>
+          <span style={{background:color+"22",color,border:`1px solid ${color}44`,padding:"4px 14px",borderRadius:20,fontSize:12,fontWeight:700}}>Niveau estimé : {level}</span>
+        </div>
+        {failed.length>0 && (
+          <div style={{background:"#111118",border:"1px solid #1e1e2e",borderRadius:14,padding:"18px 22px",marginBottom:18}}>
+            <p style={{color:"#666",fontSize:11,fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginBottom:12}}>Règles à retravailler</p>
+            {[...new Set(failed.map(f=>f.ruleName))].map((rn,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0",borderBottom:"1px solid #1a1a2a"}}>
+                <span style={{color:"#ef4444"}}>⚠</span>
+                <span style={{color:"#c0c0d0",fontSize:13}}>{rn}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        <div style={{display:"flex",gap:10}}>
+          <button onClick={onBack} style={{flex:1,padding:13,background:"transparent",border:"1px solid #2a2a3a",color:"#888",borderRadius:10,cursor:"pointer",fontSize:13}}>← Retour</button>
+          {failed.length>0 && (
+            <button onClick={onRetry} style={{flex:2,padding:13,background:"linear-gradient(135deg,#d4a017,#b8860b)",border:"none",color:"#000",borderRadius:10,cursor:"pointer",fontSize:13,fontWeight:700}}>🔄 Refaire sur mes erreurs</button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MiniCourseViewer({ module: mod, onStartPractice, onBack }) {
+  const lc = getLevelColor(mod.level);
+  return (
+    <div style={{minHeight:"100vh",background:"#0a0a0f"}}>
+      <div style={{background:"#111118",borderBottom:"1px solid #1e1e2e",padding:"14px 20px",display:"flex",alignItems:"center",gap:14,position:"sticky",top:0,zIndex:10}}>
+        <button onClick={onBack} style={{background:"transparent",border:"1px solid #2a2a3a",color:"#888",padding:"7px 14px",borderRadius:8,cursor:"pointer",fontSize:13}}>← Retour</button>
+        <span style={{fontSize:20}}>{mod.icon}</span>
+        <span style={{color:"#fff",fontFamily:"Georgia,serif",fontWeight:700,fontSize:15}}>{mod.title}</span>
+        <span style={{background:lc+"22",color:lc,border:`1px solid ${lc}44`,padding:"2px 10px",borderRadius:12,fontSize:11,fontWeight:700}}>{mod.level}</span>
+      </div>
+      <div style={{maxWidth:700,margin:"0 auto",padding:"28px 20px"}}>
+        <div style={{background:"#111118",border:"1px solid #1e1e2e",borderRadius:16,padding:"24px",marginBottom:20}}>
+          <p style={{color:"#d4a017",fontSize:11,fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:14}}>📐 La Règle</p>
+          {mod.rule.split("\n").map((line,i)=>(
+            <p key={i} style={{color:"#c8c8d8",fontSize:14,lineHeight:1.8,margin:"3px 0"}}
+              dangerouslySetInnerHTML={{__html:line.replace(/\*\*(.*?)\*\*/g,'<strong style="color:#fff">$1</strong>')}}/>
+          ))}
+        </div>
+        <div style={{background:"#111118",border:"1px solid #1e1e2e",borderRadius:16,padding:"24px",marginBottom:20}}>
+          <p style={{color:"#10b981",fontSize:11,fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:14}}>💬 Exemples</p>
+          {mod.examples.map((ex,i)=>(
+            <div key={i} style={{borderLeft:"3px solid #10b98144",paddingLeft:14,marginBottom:14}}>
+              <p style={{color:"#fff",fontSize:13,fontFamily:"Georgia,serif",margin:"0 0 3px"}}>{ex.en}</p>
+              <p style={{color:"#555",fontSize:12,margin:0}}>→ {ex.fr}</p>
+            </div>
+          ))}
+        </div>
+        <div style={{background:"#1a0d00",border:"1px solid #f59e0b44",borderRadius:16,padding:"18px 22px",marginBottom:24}}>
+          <p style={{color:"#f59e0b",fontSize:11,fontWeight:700,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>⚠️ Piège à éviter</p>
+          <p style={{color:"#d0c0a0",fontSize:13,lineHeight:1.7,margin:0}}>{mod.trap}</p>
+        </div>
+        <button onClick={onStartPractice} style={{width:"100%",padding:16,background:"linear-gradient(135deg,#d4a017,#b8860b)",border:"none",borderRadius:14,color:"#0a0a0f",fontWeight:900,fontSize:16,cursor:"pointer"}}>
+          ✏️ S'entraîner sur ce cours →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [tab, setTab] = useState("dashboard");
+  const [view, setView] = useState("main");
+  const [activeModule, setActiveModule] = useState(null);
+  const [quizConfig, setQuizConfig] = useState(null);
+  const [lastResult, setLastResult] = useState(null);
+  const [history, setHistory] = useState(INITIAL_HISTORY);
+  const [failedModules, setFailedModules] = useState(["b2-1","c1-3","c1-2"]);
+  const [selectedLevel, setSelectedLevel] = useState("B1");
+
+  const allModules = Object.values(SYLLABUS).flat();
+
+  function saveResult(result, type) {
+    const entry = {id:Date.now(),date:new Date().toLocaleDateString("fr-FR"),type,score:result.score,total:result.total,level:getLevel(result.score,result.total)};
+    setHistory(h=>[entry,...h]);
+    if (result.failed.length>0) {
+      const ids=[...new Set(result.failed.map(f=>f.moduleId))];
+      setFailedModules(prev=>[...new Set([...prev,...ids])]);
+    }
+  }
+
+  function launchQuiz(questions,title,quizType) {
+    setQuizConfig({questions:shuffle(questions),title,quizType});
+    setView("quiz");
+  }
+
+  function handleQuizFinish(result) {
+    setLastResult(result);
+    saveResult(result,quizConfig.quizType);
+    setView("results");
+  }
+
+  function handleQuit(){setView("main");setActiveModule(null);setQuizConfig(null);}
+
+  if (view==="quiz"&&quizConfig) return <QuizEngine questions={quizConfig.questions} title={quizConfig.title} onFinish={handleQuizFinish} onQuit={handleQuit}/>;
+  if (view==="results"&&lastResult) return (
+    <ResultsScreen score={lastResult.score} total={lastResult.total} failed={lastResult.failed}
+      onBack={()=>{setView("main");setActiveModule(null);}}
+      onRetry={()=>{
+        const ids=[...new Set(lastResult.failed.map(f=>f.moduleId))];
+        launchQuiz(ALL_QUESTIONS.filter(q=>ids.includes(q.moduleId)),"🔄 Rédemption","Rédemption");
+      }}/>
+  );
+  if (view==="course"&&activeModule) return (
+    <MiniCourseViewer module={activeModule} onBack={()=>{setView("main");setActiveModule(null);}}
+      onStartPractice={()=>launchQuiz(activeModule.questions,`✏️ ${activeModule.title}`,`Entraînement · ${activeModule.title}`)}/>
+  );
+
+  const tabs=[
+    {id:"dashboard",label:"Dashboard",icon:"📊"},
+    {id:"library",label:"Bibliothèque",icon:"📚"},
+    {id:"exam",label:"Examen Blanc",icon:"📝"},
+    {id:"revision",label:"Révision",icon:"🔁"},
+  ];
+
+  const failedModuleObjs=allModules.filter(m=>failedModules.includes(m.id));
+
+  return (
+    <div style={{minHeight:"100vh",background:"#0a0a0f",fontFamily:"Trebuchet MS,sans-serif"}}>
+      <nav style={{background:"#0d0d15",borderBottom:"1px solid #1e1e2e",padding:"0 16px",display:"flex",alignItems:"center",flexWrap:"wrap",position:"sticky",top:0,zIndex:20}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,padding:"14px 16px 14px 0",marginRight:16,borderRight:"1px solid #1e1e2e"}}>
+          <span style={{fontSize:18}}>🎓</span>
+          <span style={{color:"#d4a017",fontFamily:"Georgia,serif",fontWeight:700,fontSize:15,letterSpacing:1}}>TOEIC MASTER</span>
+        </div>
+        <div style={{display:"flex",gap:0,flexWrap:"wrap"}}>
+          {tabs.map(t=>(
+            <button key={t.id} onClick={()=>setTab(t.id)} style={{background:"transparent",border:"none",padding:"16px 14px",cursor:"pointer",color:tab===t.id?"#d4a017":"#666",fontSize:13,fontWeight:tab===t.id?700:400,borderBottom:tab===t.id?"2px solid #d4a017":"2px solid transparent",transition:"all 0.2s",display:"flex",alignItems:"center",gap:5,whiteSpace:"nowrap"}}>
+              {t.icon} {t.label}
+            </button>
+          ))}
+        </div>
+      </nav>
+
+      <div style={{maxWidth:880,margin:"0 auto",padding:"28px 16px"}}>
+
+        {tab==="dashboard" && (
+          <div>
+            <h1 style={{color:"#fff",fontFamily:"Georgia,serif",fontSize:26,margin:"0 0 4px"}}>Tableau de Bord</h1>
+            <p style={{color:"#555",fontSize:13,marginBottom:28}}>Suivez votre progression vers l'excellence TOEIC</p>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:14,marginBottom:28}}>
+              {[
+                {label:"Tests effectués",value:history.length,color:"#d4a017"},
+                {label:"Meilleur score",value:`${Math.max(...history.map(h=>Math.round(h.score/h.total*100)))}%`,color:"#10b981"},
+                {label:"Niveau actuel",value:history[0]?.level||"B1",color:"#8b5cf6"},
+              ].map((s,i)=>(
+                <div key={i} style={{background:"#111118",border:"1px solid #1e1e2e",borderRadius:14,padding:"18px 20px"}}>
+                  <p style={{color:"#444",fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",marginBottom:6}}>{s.label}</p>
+                  <p style={{color:s.color,fontSize:26,fontWeight:900,fontFamily:"Georgia,serif",margin:0}}>{s.value}</p>
+                </div>
+              ))}
+            </div>
+            <div style={{background:"linear-gradient(135deg,#1a1408,#150f00)",border:"1px solid #d4a01733",borderRadius:16,padding:"22px",marginBottom:28,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:14}}>
+              <div>
+                <p style={{color:"#d4a017",fontWeight:700,fontSize:15,margin:"0 0 3px"}}>Test de Niveau Global</p>
+                <p style={{color:"#666",fontSize:13,margin:0}}>20 questions · Tous niveaux · ~15 min</p>
+              </div>
+              <button onClick={()=>launchQuiz(shuffle(ALL_QUESTIONS).slice(0,20),"Test de Niveau Global","Test Global")}
+                style={{background:"linear-gradient(135deg,#d4a017,#b8860b)",border:"none",color:"#000",padding:"13px 24px",borderRadius:10,cursor:"pointer",fontWeight:700,fontSize:14}}>
+                🚀 Démarrer
+              </button>
+            </div>
+            <div style={{background:"#111118",border:"1px solid #1e1e2e",borderRadius:16,overflow:"hidden"}}>
+              <div style={{padding:"14px 20px",borderBottom:"1px solid #1e1e2e"}}>
+                <p style={{color:"#555",fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",margin:0}}>Mon Historique</p>
+              </div>
+              {history.map((h,i)=>{
+                const p=Math.round(h.score/h.total*100);
+                return (
+                  <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 20px",borderBottom:"1px solid #0f0f1a",flexWrap:"wrap",gap:8}}>
+                    <div style={{display:"flex",alignItems:"center",gap:10}}>
+                      <span style={{color:"#3a3a4a",fontSize:12,width:75}}>{h.date}</span>
+                      <span style={{color:"#c0c0d0",fontSize:13}}>{h.type}</span>
+                    </div>
+                    <div style={{display:"flex",alignItems:"center",gap:10}}>
+                      <div style={{width:80,height:5,background:"#1a1a2e",borderRadius:4}}>
+                        <div style={{height:5,width:`${p}%`,background:getLevelColor(h.level),borderRadius:4}}/>
+                      </div>
+                      <span style={{color:"#fff",fontSize:13,fontWeight:700,width:45}}>{h.score}/{h.total}</span>
+                      <span style={{background:getLevelColor(h.level)+"22",color:getLevelColor(h.level),border:`1px solid ${getLevelColor(h.level)}44`,padding:"2px 8px",borderRadius:12,fontSize:10,fontWeight:700}}>{h.level}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {tab==="library" && (
+          <div>
+            <h1 style={{color:"#fff",fontFamily:"Georgia,serif",fontSize:26,margin:"0 0 4px"}}>Bibliothèque de Cours</h1>
+            <p style={{color:"#555",fontSize:13,marginBottom:22}}>Choisissez un niveau, lisez le cours, puis entraînez-vous</p>
+            <div style={{display:"flex",gap:10,marginBottom:24}}>
+              {["B1","B2","C1"].map(l=>(
+                <button key={l} onClick={()=>setSelectedLevel(l)} style={{padding:"9px 22px",borderRadius:10,border:`2px solid ${selectedLevel===l?getLevelColor(l):"#1e1e2e"}`,background:selectedLevel===l?getLevelColor(l)+"22":"transparent",color:selectedLevel===l?getLevelColor(l):"#555",fontWeight:700,fontSize:14,cursor:"pointer",transition:"all 0.2s"}}>{l}</button>
+              ))}
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:14}}>
+              {SYLLABUS[selectedLevel].map(mod=>(
+                <div key={mod.id} onClick={()=>{setActiveModule(mod);setView("course");}}
+                  style={{background:"#111118",border:"1px solid #1e1e2e",borderRadius:16,padding:"20px",cursor:"pointer",position:"relative",overflow:"hidden",transition:"border-color 0.2s"}}
+                  onMouseEnter={e=>e.currentTarget.style.borderColor=mod.color+"66"}
+                  onMouseLeave={e=>e.currentTarget.style.borderColor="#1e1e2e"}>
+                  <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:mod.color+"88"}}/>
+                  <span style={{fontSize:26,display:"block",marginBottom:10}}>{mod.icon}</span>
+                  <p style={{color:"#fff",fontFamily:"Georgia,serif",fontSize:15,fontWeight:700,margin:"0 0 4px"}}>{mod.title}</p>
+                  <p style={{color:"#555",fontSize:12,margin:"0 0 14px"}}>{mod.subtitle}</p>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <span style={{color:"#444",fontSize:11}}>{mod.questions.length} exercices</span>
+                    <span style={{color:mod.color,fontSize:12,fontWeight:700}}>Ouvrir →</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {tab==="exam" && (
+          <div style={{maxWidth:620,margin:"0 auto"}}>
+            <h1 style={{color:"#fff",fontFamily:"Georgia,serif",fontSize:26,margin:"0 0 4px"}}>Examen Blanc</h1>
+            <p style={{color:"#555",fontSize:13,marginBottom:28}}>Simulation complète · Questions aléatoires de tous les modules</p>
+            <div style={{display:"grid",gap:14,marginBottom:28}}>
+              {[
+                {label:"Examen Court",desc:"10 questions · ~8 min",q:10,icon:"⚡"},
+                {label:"Examen Standard",desc:"20 questions · ~15 min",q:20,icon:"📝"},
+                {label:"Examen Complet",desc:`${ALL_QUESTIONS.length} questions · ~35 min`,q:ALL_QUESTIONS.length,icon:"🏆"},
+              ].map((exam,i)=>(
+                <div key={i} style={{background:"#111118",border:"1px solid #1e1e2e",borderRadius:16,padding:"18px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12}}>
+                  <div style={{display:"flex",alignItems:"center",gap:14}}>
+                    <span style={{fontSize:24}}>{exam.icon}</span>
+                    <div>
+                      <p style={{color:"#fff",fontWeight:700,fontSize:15,margin:"0 0 2px"}}>{exam.label}</p>
+                      <p style={{color:"#555",fontSize:12,margin:0}}>{exam.desc}</p>
+                    </div>
+                  </div>
+                  <button onClick={()=>launchQuiz(shuffle(ALL_QUESTIONS).slice(0,exam.q),exam.label,"Examen Blanc")}
+                    style={{background:"linear-gradient(135deg,#d4a017,#b8860b)",border:"none",color:"#000",padding:"11px 20px",borderRadius:10,cursor:"pointer",fontWeight:700,fontSize:13}}>
+                    Démarrer →
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {tab==="revision" && (
+          <div>
+            <h1 style={{color:"#fff",fontFamily:"Georgia,serif",fontSize:26,margin:"0 0 4px"}}>Espace Révision</h1>
+            <p style={{color:"#555",fontSize:13,marginBottom:28}}>Répétition espacée basée sur vos erreurs passées</p>
+            {failedModuleObjs.length===0 ? (
+              <div style={{textAlign:"center",padding:"60px 20px",color:"#444"}}>
+                <span style={{fontSize:44,display:"block",marginBottom:14}}>🎯</span>
+                <p style={{fontSize:15}}>Aucune erreur enregistrée. Lancez d'abord un test !</p>
+              </div>
+            ) : (
+              <>
+                <div style={{background:"#111118",border:"1px solid #1e1e2e",borderRadius:16,padding:"18px 20px",marginBottom:20}}>
+                  <p style={{color:"#555",fontSize:10,fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginBottom:14}}>Modules à retravailler ({failedModuleObjs.length})</p>
+                  {failedModuleObjs.map(m=>(
+                    <div key={m.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"11px 0",borderBottom:"1px solid #0f0f1a",flexWrap:"wrap",gap:10}}>
+                      <div style={{display:"flex",alignItems:"center",gap:10}}>
+                        <span style={{fontSize:18}}>{m.icon}</span>
+                        <div>
+                          <p style={{color:"#fff",fontSize:13,fontWeight:600,margin:"0 0 2px"}}>{m.title}</p>
+                          <span style={{background:getLevelColor(m.level)+"22",color:getLevelColor(m.level),fontSize:10,padding:"2px 7px",borderRadius:8,fontWeight:700}}>{m.level}</span>
+                        </div>
+                      </div>
+                      <div style={{display:"flex",gap:8}}>
+                        <button onClick={()=>{setActiveModule(m);setView("course");}}
+                          style={{background:"transparent",border:"1px solid #2a2a3a",color:"#777",padding:"7px 12px",borderRadius:8,cursor:"pointer",fontSize:12}}>Cours</button>
+                        <button onClick={()=>launchQuiz(m.questions,`🔁 ${m.title}`,`Révision · ${m.title}`)}
+                          style={{background:"#1a1400",border:"1px solid #d4a01744",color:"#d4a017",padding:"7px 12px",borderRadius:8,cursor:"pointer",fontSize:12,fontWeight:700}}>Quiz</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={()=>launchQuiz(shuffle(failedModuleObjs.flatMap(m=>m.questions)),"🔁 Révision Complète","Révision")}
+                  style={{width:"100%",padding:15,background:"linear-gradient(135deg,#d4a017,#b8860b)",border:"none",borderRadius:14,color:"#000",fontWeight:900,fontSize:15,cursor:"pointer"}}>
+                  🚀 Lancer la Révision Complète ({failedModuleObjs.reduce((s,m)=>s+m.questions.length,0)} questions)
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
